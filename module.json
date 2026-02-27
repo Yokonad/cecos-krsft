@@ -1,10 +1,13 @@
 {
-  "name": "Cecos",
-  "slug": "cecos",
-  "version": "1.0.0",
-  "description": "Módulo para gestionar Centros de Costo del ERP Korosoft",
-  "dependencies": [],
-  "allowed_cargos": ["administrador", "gerente", "supervisorado", "usuario"],
-  "author": "Korosoft",
-  "license": "MIT"
+  "name": "CecosKrsft",
+  "slug": "cecos_krsft",
+  "display_name": "CENTROS DE COSTO",
+  "version": "2.0.0",
+  "description": "v2.0.0: Gestión de centros de costo",
+  "icon": "icon.svg",
+  "color": "#0AA4A4",
+  "gradient": "#0AA4A4",
+  "author": "yokonad",
+  "enabled": true,
+  "dependencies": []
 }
