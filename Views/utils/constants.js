@@ -15,4 +15,4 @@ export const CECOSStatusColors = {
   [CECOSStatus.INACTIVE]: 'warning',
 };
 
-export const POLLING_INTERVAL = 3000; // 3 segundos
+export const POLLING_INTERVAL = 30000; // 30 segundos

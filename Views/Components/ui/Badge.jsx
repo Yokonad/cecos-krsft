@@ -1,73 +1,27 @@
-import clsx from 'clsx';
+const colorMap = {
+  success: { bg: 'bg-emerald-100', text: 'text-emerald-700', icon: 'text-emerald-700' },
+  warning: { bg: 'bg-amber-100',   text: 'text-amber-700',   icon: 'text-amber-700' },
+  error:   { bg: 'bg-red-100',     text: 'text-red-700',     icon: 'text-red-700' },
+  info:    { bg: 'bg-blue-100',    text: 'text-blue-700',    icon: 'text-blue-700' },
+  primary: { bg: 'bg-teal-100',    text: 'text-teal-700',    icon: 'text-teal-700' },
+  secondary:{ bg: 'bg-gray-100',   text: 'text-gray-700',    icon: 'text-gray-700' },
+};
 
-/**
- * Componente Badge para etiquetas
- * @param {Object} props
- * @param {string} props.children - Contenido del badge
- * @param {string} props.variant - SOLID, BORDER o DOT
- * @param {string} props.color - Color: success, warning, error, info, primary, secondary, etc.
- * @param {boolean} props.dismissible - Mostrar botón eliminar
- * @param {Function} props.onDismiss - Callback al eliminar
- * @param {string} props.icon - Clase de ícono
- */
-export default function Badge({
-  children,
-  variant = 'SOLID',
-  color = 'primary',
-  dismissible = false,
-  onDismiss,
-  icon,
-}) {
-  const baseClasses =
-    'inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium transition-colors';
-
-  const variantClasses = {
-    SOLID: {
-      success: 'bg-green-100 text-green-800',
-      warning: 'bg-yellow-100 text-yellow-800',
-      error: 'bg-red-100 text-red-800',
-      info: 'bg-blue-100 text-blue-800',
-      primary: 'bg-teal-100 text-teal-800',
-      secondary: 'bg-gray-100 text-gray-800',
-    },
-    BORDER: {
-      success: 'border border-green-300 text-green-700 bg-white',
-      warning: 'border border-yellow-300 text-yellow-700 bg-white',
-      error: 'border border-red-300 text-red-700 bg-white',
-      info: 'border border-blue-300 text-blue-700 bg-white',
-      primary: 'border border-teal-300 text-teal-700 bg-white',
-      secondary: 'border border-gray-300 text-gray-700 bg-white',
-    },
-    DOT: {
-      success: 'text-green-700 bg-white',
-      warning: 'text-yellow-700 bg-white',
-      error: 'text-red-700 bg-white',
-      info: 'text-blue-700 bg-white',
-      primary: 'text-teal-700 bg-white',
-      secondary: 'text-gray-700 bg-white',
-    },
-  };
-
-  const dotClasses = {
-    success: 'w-2 h-2 rounded-full bg-green-500',
-    warning: 'w-2 h-2 rounded-full bg-yellow-500',
-    error: 'w-2 h-2 rounded-full bg-red-500',
-    info: 'w-2 h-2 rounded-full bg-blue-500',
-    primary: 'w-2 h-2 rounded-full bg-teal-500',
-    secondary: 'w-2 h-2 rounded-full bg-gray-500',
-  };
+export default function Badge({ children, color = 'primary', dismissible = false, onDismiss }) {
+  const c = colorMap[color] ?? colorMap.secondary;
 
   return (
-    <span className={clsx(baseClasses, variantClasses[variant][color])}>
-      {variant === 'DOT' && <span className={dotClasses[color]} />}
-      {icon && <i className={clsx(icon, 'text-sm')} />}
-      {children}
+    <span className={`inline-flex items-center justify-center rounded-full px-2.5 py-0.5 ${c.bg} ${c.text}`}>
+      <p className="text-sm whitespace-nowrap">{children}</p>
       {dismissible && (
         <button
           onClick={onDismiss}
-          className="ml-1 text-current opacity-70 hover:opacity-100 transition-opacity"
+          className={`ms-1.5 -me-1 inline-block rounded-full p-0.5 transition hover:opacity-70 ${c.icon}`}
         >
-          ×
+          <span className="sr-only">Quitar</span>
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-3">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
         </button>
       )}
     </span>
