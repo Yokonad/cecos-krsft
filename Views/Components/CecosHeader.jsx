@@ -21,14 +21,10 @@ export default function CecosHeader({ onBack, onCreate }) {
         </h1>
       </div>
 
-      <button
-        type="button"
-        onClick={onCreate}
-        className="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm transition-colors hover:border-gray-400 hover:bg-gray-50"
-      >
+      <Button variant="primary" size="md" onClick={onCreate} className="gap-2">
         <PlusIcon className="size-4" />
-        Nuevo Centro
-      </button>
+        Agregar
+      </Button>
     </header>
   );
 }

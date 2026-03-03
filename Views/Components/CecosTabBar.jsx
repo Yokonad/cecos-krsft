@@ -1,72 +1,20 @@
-import {
-  TableCellsIcon,
-  CheckBadgeIcon,
-  NoSymbolIcon,
-  RectangleStackIcon,
-} from '@heroicons/react/24/outline';
+import { TableCellsIcon } from '@heroicons/react/24/outline';
 
-export default function CecosTabBar({ activeTab, setActiveTab, counts }) {
-  const tabs = [
-    {
-      key: 'all',
-      label: 'TODOS',
-      count: counts.total,
-      icon: TableCellsIcon,
-      activeColor: 'border-blue-500',
-      textActiveColor: 'text-blue-600',
-    },
-    {
-      key: 'active',
-      label: 'ACTIVOS',
-      count: counts.activos,
-      icon: CheckBadgeIcon,
-      activeColor: 'border-emerald-500',
-      textActiveColor: 'text-emerald-600',
-    },
-    {
-      key: 'inactive',
-      label: 'INACTIVOS',
-      count: counts.inactivos,
-      icon: NoSymbolIcon,
-      activeColor: 'border-red-500',
-      textActiveColor: 'text-red-600',
-    },
-    {
-      key: 'tree',
-      label: 'JERARQUÍA',
-      count: counts.total,
-      icon: RectangleStackIcon,
-      activeColor: 'border-amber-500',
-      textActiveColor: 'text-amber-600',
-    },
-  ];
-
+export default function CecosTabBar({ counts }) {
   return (
     <div className="flex flex-wrap gap-6 border-b border-gray-200" role="tablist" aria-label="Vistas de centros de costo">
-      {tabs.map((tab) => {
-        const Icon = tab.icon;
-        const isActive = activeTab === tab.key;
-
-        return (
-          <button
-            key={tab.key}
-            role="tab"
-            aria-selected={isActive}
-            onClick={() => setActiveTab(tab.key)}
-            className={`inline-flex items-center gap-2 px-1 py-3 text-xs font-semibold tracking-wide transition-colors border-b-2 -mb-[1px] ${
-              isActive
-                ? `${tab.activeColor} ${tab.textActiveColor}`
-                : 'border-transparent text-gray-500 hover:text-gray-700'
-            }`}
-          >
-            <Icon className="size-4 shrink-0" />
-            {tab.label}
-            <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-700">
-              {tab.count}
-            </span>
-          </button>
-        );
-      })}
+      <button
+        key="all"
+        role="tab"
+        aria-selected={true}
+        className="inline-flex items-center gap-2 px-1 py-3 text-xs font-semibold tracking-wide transition-colors border-b-2 -mb-[1px] border-blue-500 text-blue-600"
+      >
+        <TableCellsIcon className="size-4 shrink-0" />
+        JERARQUÍA
+        <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-700">
+          {counts.total}
+        </span>
+      </button>
     </div>
   );
 }

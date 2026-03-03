@@ -24,22 +24,24 @@ class CecosController extends Controller
 
     public function list(Request $request)
     {
-        $query = Ceco::query();
+        $query = Ceco::query()
+            ->leftJoin('projects', 'cecos.id', '=', 'projects.ceco_id')
+            ->select('cecos.*', 'projects.id as project_id');
 
         if ($request->has('search') && $request->search) {
             $search = '%' . $request->search . '%';
             $query->where(function ($q) use ($search) {
-                $q->where('codigo', 'like', $search)
-                    ->orWhere('nombre', 'like', $search)
-                    ->orWhere('razon_social', 'like', $search);
+                $q->where('cecos.codigo', 'like', $search)
+                    ->orWhere('cecos.nombre', 'like', $search)
+                    ->orWhere('cecos.razon_social', 'like', $search);
             });
         }
 
         if ($request->has('sort_by')) {
             $direction = $request->get('sort_direction', 'asc');
-            $query->orderBy($request->sort_by, $direction);
+            $query->orderBy('cecos.' . $request->sort_by, $direction);
         } else {
-            $query->orderBy('codigo', 'asc');
+            $query->orderBy('cecos.codigo', 'asc');
         }
 
         $cecos = $query->paginate($request->get('per_page', 15));
@@ -76,7 +78,7 @@ class CecosController extends Controller
             'nombre' => 'required|string|max:255',
             'razon_social' => 'nullable|string|max:255',
             'descripcion' => 'nullable|string',
-            'tipo_cliente' => 'required|in:0101,0102,0103,0104,0105,0106,0107,0108,0109',
+            'tipo_cliente' => 'required|string|max:50',
             'estado' => 'boolean',
         ]);
 
@@ -174,15 +176,7 @@ class CecosController extends Controller
             ], 404);
         }
 
-        // No permitir eliminar si tiene hijos
-        if ($ceco->children()->exists()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'No se puede eliminar un CECO que tiene subcuentas asociadas',
-            ], 422);
-        }
-
-        // No permitir eliminar clientes que tienen subcuentas generadas
+        // No permitir eliminar subcuentas individuales
         if ($ceco->isSubcuenta()) {
             return response()->json([
                 'success' => false,
@@ -190,11 +184,17 @@ class CecosController extends Controller
             ], 422);
         }
 
-        $ceco->delete();
+        DB::transaction(function () use ($ceco) {
+            // Si es cabeza, eliminar primero subcuentas y luego la cabeza
+            if ($ceco->children()->exists()) {
+                $ceco->children()->delete();
+            }
+            $ceco->delete();
+        });
 
         return response()->json([
             'success' => true,
-            'message' => 'Centro de costo eliminado exitosamente',
+            'message' => 'Cabeza de CECO y subcuentas eliminadas exitosamente',
         ]);
     }
 

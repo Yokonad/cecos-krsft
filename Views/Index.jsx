@@ -1,93 +1,78 @@
 import { useMemo, useState } from 'react';
 import { useCecosData } from './hooks/useCecosData';
 import CecosTable from './Components/CecosTable';
-import CecosTreeView from './Components/CecosTreeView';
-import CecoModal from './Components/CecoModal';
-import SearchBar from './Components/SearchBar';
 import CecosHeader from './Components/CecosHeader';
 import CecosStats from './Components/CecosStats';
 import CecosTabBar from './Components/CecosTabBar';
+import CecoModal from './Components/CecoModal';
 
 export default function Index({ auth }) {
-  const { cecos, tree, loading, error, currentPage, totalPages, search, createCeco, createCecoWithSubcuentas, updateCeco, deleteCeco, handleSearch, handlePageChange } = useCecosData(auth);
+  const { cecos, loading, error, createCeco, createCecoWithSubcuentas, updateCeco, deleteCeco } = useCecosData(auth);
 
+  const [toast, setToast] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [editingCeco, setEditingCeco] = useState(null);
-  const [toast, setToast] = useState(null);
-  const [activeTab, setActiveTab] = useState('all');
 
-  const flattenedTree = useMemo(() => {
-    const flatten = (nodes = []) => nodes.flatMap((node) => [node, ...flatten(node.children || [])]);
-    return flatten(tree || []);
-  }, [tree]);
+  const stats = useMemo(() => ({
+    total: cecos.length,
+    activos: cecos.filter(c => c.estado).length,
+    inactivos: cecos.filter(c => !c.estado).length,
+    subcuentas: cecos.filter(c => !!c.tipo_subcuenta).length,
+  }), [cecos]);
 
-  const stats = useMemo(() => {
-    const total = flattenedTree.length;
-    const activos = flattenedTree.filter((node) => node.estado).length;
-    const inactivos = total - activos;
-    const subcuentas = flattenedTree.filter((node) => !!node.tipo_subcuenta).length;
-    return { total, activos, inactivos, subcuentas };
-  }, [flattenedTree]);
+  const tabCounts = useMemo(() => ({
+    total: cecos.length,
+    activos: cecos.filter(c => c.estado).length,
+    inactivos: cecos.filter(c => !c.estado).length,
+  }), [cecos]);
 
-  const displayedCecos = useMemo(() => {
-    if (activeTab === 'active') return cecos.filter((item) => !!item.estado);
-    if (activeTab === 'inactive') return cecos.filter((item) => !item.estado);
-    return cecos;
-  }, [activeTab, cecos]);
-
-  const isTreeTab = activeTab === 'tree';
-  const tableCurrentPage = activeTab === 'all' ? currentPage : 1;
-  const tableTotalPages = activeTab === 'all' ? totalPages : 1;
+  const displayedCecos = cecos;
 
   const showToast = (message, type = 'success') => {
     setToast({ message, type });
-    setTimeout(() => setToast(null), 3500);
+    setTimeout(() => setToast(null), 1300);
   };
 
-  const handleOpenModal = (ceco = null) => {
+  const handleBack = () => {
+    window.history.back();
+  };
+
+  const handleOpenCreate = () => {
+    setEditingCeco(null);
+    setShowModal(true);
+  };
+
+  const handleOpenEdit = (ceco) => {
     setEditingCeco(ceco);
     setShowModal(true);
   };
 
   const handleCloseModal = () => {
-    setEditingCeco(null);
     setShowModal(false);
+    setEditingCeco(null);
   };
 
-  const handleSubmit = async (data, isWithSubcuentas = false) => {
+  const handleSubmit = async (payload, withSubcuentas = false) => {
     let result;
     if (editingCeco) {
-      result = await updateCeco(editingCeco.id, data);
-    } else if (isWithSubcuentas) {
-      // Crear cliente con subcuentas automáticas
-      result = await createCecoWithSubcuentas(
-        data.nombre, 
-        data.razon_social, 
-        data.descripcion, 
-        data.tipo_cliente
-      );
+      result = await updateCeco(editingCeco.id, payload);
+    } else if (withSubcuentas) {
+      result = await createCecoWithSubcuentas(payload);
     } else {
-      // Crear cliente simple
-      result = await createCeco(data);
+      result = await createCeco(payload);
     }
 
     if (result.success) {
+      showToast(result.message || (editingCeco ? 'Cabeza actualizada' : 'Cabeza creada'));
       handleCloseModal();
-      showToast(result.message || (editingCeco ? 'Centro de costo actualizado' : 'Cliente y subcuentas creados exitosamente'));
     }
 
     return result;
   };
 
-  const handleDelete = async (id) => {
-    const result = await deleteCeco(id);
-    if (result?.success) {
-      showToast(result.message || 'Centro de costo eliminado');
-    }
-  };
-
-  const handleBack = () => {
-    window.history.back();
+  const handleDelete = async (cecoId) => {
+    const result = await deleteCeco(cecoId);
+    showToast(result.message || (result.success ? 'Cabeza eliminada' : 'No se pudo eliminar'), result.success ? 'success' : 'error');
   };
 
   return (
@@ -125,7 +110,7 @@ export default function Index({ auth }) {
       {/* Content */}
       <div className="w-full px-12 py-4">
         <div className="space-y-6">
-          <CecosHeader onBack={handleBack} onCreate={() => handleOpenModal()} />
+          <CecosHeader onBack={handleBack} onCreate={handleOpenCreate} />
 
           <CecosStats
             total={stats.total}
@@ -134,17 +119,7 @@ export default function Index({ auth }) {
             subcuentas={stats.subcuentas}
           />
 
-          <CecosTabBar
-            activeTab={activeTab}
-            setActiveTab={setActiveTab}
-            counts={{
-              total: stats.total,
-              activos: stats.activos,
-              inactivos: stats.inactivos,
-            }}
-          />
-
-          {!isTreeTab && <SearchBar value={search} onChange={handleSearch} />}
+          <CecosTabBar counts={tabCounts} />
 
           {/* Error */}
           {error && (
@@ -158,37 +133,22 @@ export default function Index({ auth }) {
             </div>
           )}
 
-          {/* Conditional Views */}
-          {!isTreeTab ? (
-            <CecosTable
-              cecos={displayedCecos}
-              loading={loading}
-              onEdit={handleOpenModal}
-              onDelete={handleDelete}
-              onPageChange={activeTab === 'all' ? handlePageChange : () => {}}
-              currentPage={tableCurrentPage}
-              totalPages={tableTotalPages}
-            />
-          ) : (
-            <CecosTreeView
-              tree={tree}
-              loading={loading}
-              onEdit={handleOpenModal}
-              onDelete={handleDelete}
-            />
-          )}
+          <CecosTable
+            cecos={displayedCecos}
+            loading={loading}
+            onEdit={handleOpenEdit}
+            onDelete={handleDelete}
+          />
         </div>
       </div>
 
-      {/* Modal */}
-      {showModal && (
-        <CecoModal
-          isOpen={showModal}
-          onClose={handleCloseModal}
-          onSubmit={handleSubmit}
-          initialData={editingCeco}
-        />
-      )}
+      <CecoModal
+        isOpen={showModal}
+        onClose={handleCloseModal}
+        onSubmit={handleSubmit}
+        initialData={editingCeco}
+        cecos={cecos}
+      />
     </div>
   );
 }

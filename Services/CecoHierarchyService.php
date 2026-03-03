@@ -90,11 +90,20 @@ class CecoHierarchyService
 
     private function getNextConsecutiveCode(string $tipoCliente): string
     {
-        if (!in_array($tipoCliente, self::GRUPOS_VALIDOS, true)) {
-            throw new \Exception("Grupo no válido: {$tipoCliente}. Debe ser 0101-0109");
+        $isBaseGroup = in_array($tipoCliente, self::GRUPOS_VALIDOS, true);
+        $isCustomParent = Ceco::where('codigo', $tipoCliente)
+            ->where('nivel', 1)
+            ->whereNull('parent_id')
+            ->whereNull('tipo_subcuenta')
+            ->exists();
+
+        if (!$isBaseGroup && !$isCustomParent) {
+            throw new \Exception("Grupo no válido: {$tipoCliente}. Debe ser 0101-0109 o un CECO padre existente");
         }
 
-        $lastParent = Ceco::where('tipo_cliente', $tipoCliente)
+        // La secuencia se calcula por prefijo de código del grupo (ej: 0101xx, 0102xx)
+        // para respetar la lógica histórica de codificación.
+        $lastParent = Ceco::where('codigo', 'like', $tipoCliente . '__')
             ->where('nivel', 1)
             ->whereNull('parent_id')
             ->orderBy('codigo', 'desc')
