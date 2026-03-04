@@ -5,8 +5,8 @@
   "version": "2.0.0",
   "description": "v2.0.0: Gestión de centros de costo",
   "icon": "icon.svg",
-  "color": "#0AA4A4",
-  "gradient": "#0AA4A4",
+  "color": "#F59E0B",
+  "gradient": "#F59E0B",
   "author": "yokonad",
   "enabled": true,
   "dependencies": []
