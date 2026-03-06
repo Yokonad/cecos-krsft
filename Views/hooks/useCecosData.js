@@ -18,7 +18,7 @@ export function useCecosData(auth) {
   // ── Cargar CECOs (lista plana) ───
   const loadCecos = useCallback(async () => {
     try {
-      const response = await fetch('/api/cecoskrsft/list?per_page=500');
+      const response = await fetch('/api/cecoskrsft/list');
       const result = await response.json();
 
       if (result.success) {

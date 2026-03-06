@@ -25,8 +25,7 @@ class CecosController extends Controller
     public function list(Request $request)
     {
         $query = Ceco::query()
-            ->leftJoin('projects', 'cecos.id', '=', 'projects.ceco_id')
-            ->select('cecos.*', 'projects.id as project_id');
+            ->selectRaw('cecos.*, (SELECT id FROM projects WHERE projects.ceco_id = cecos.id LIMIT 1) as project_id');
 
         if ($request->has('search') && $request->search) {
             $search = '%' . $request->search . '%';
@@ -44,17 +43,12 @@ class CecosController extends Controller
             $query->orderBy('cecos.codigo', 'asc');
         }
 
-        $cecos = $query->paginate($request->get('per_page', 15));
+        $cecos = $query->get();
 
         return response()->json([
             'success' => true,
-            'data' => $cecos->items(),
-            'pagination' => [
-                'total' => $cecos->total(),
-                'per_page' => $cecos->perPage(),
-                'current_page' => $cecos->currentPage(),
-                'last_page' => $cecos->lastPage(),
-            ],
+            'data' => $cecos,
+            'total' => $cecos->count(),
         ]);
     }
 

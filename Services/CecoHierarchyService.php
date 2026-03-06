@@ -7,7 +7,7 @@ use Modulos_ERP\CecosKrsft\Models\Ceco;
 
 class CecoHierarchyService
 {
-    private const GRUPOS_VALIDOS = ['0101', '0102', '0103', '0104', '0105', '0106', '0107', '0108', '0109'];
+    private const GRUPOS_VALIDOS = ['0101', '0102', '0103', '0104', '0105', '0106', '0107', '108', '109'];
 
     private const SUBCUENTAS = [
         ['tipo' => '01', 'nombre_suffix' => 'MO (Mano de Obra)'],

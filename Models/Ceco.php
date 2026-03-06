@@ -51,6 +51,14 @@ class Ceco extends Model
     }
 
     /**
+     * Relación con los proyectos asociados a este CECO
+     */
+    public function projects(): HasMany
+    {
+        return $this->hasMany(\Modulos_ERP\ProyectosKrsft\Models\Project::class, 'ceco_id');
+    }
+
+    /**
      * Relación con los hijos jerárquicos
      */
     public function children(): HasMany
@@ -117,6 +125,14 @@ class Ceco extends Model
             '03' => 'Gastos Indirectos',
             default => null,
         };
+    }
+
+    /**
+     * Verifica si el CECO está siendo usado por algún proyecto
+     */
+    public function isUsedByProject(): bool
+    {
+        return $this->projects()->exists();
     }
 }
 

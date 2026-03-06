@@ -13,12 +13,15 @@ export default function Index({ auth }) {
   const [showModal, setShowModal] = useState(false);
   const [editingCeco, setEditingCeco] = useState(null);
 
-  const stats = useMemo(() => ({
-    total: cecos.length,
-    activos: cecos.filter(c => c.estado).length,
-    inactivos: cecos.filter(c => !c.estado).length,
-    subcuentas: cecos.filter(c => !!c.tipo_subcuenta).length,
-  }), [cecos]);
+  const stats = useMemo(() => {
+    const clientes = cecos.filter(c => !c.tipo_subcuenta && c.nivel === 1);
+    return {
+      total: clientes.length,
+      activos: clientes.filter(c => c.estado).length,
+      inactivos: clientes.filter(c => !c.estado).length,
+      subcuentas: cecos.filter(c => !!c.tipo_subcuenta).length,
+    };
+  }, [cecos]);
 
   const tabCounts = useMemo(() => ({
     total: cecos.length,
@@ -76,7 +79,7 @@ export default function Index({ auth }) {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="cecos-scroll-hidden h-screen overflow-y-auto bg-gray-50">
       {/* Toast */}
       {toast && (
         <div className="fixed top-4 right-4 z-50">
@@ -149,6 +152,16 @@ export default function Index({ auth }) {
         initialData={editingCeco}
         cecos={cecos}
       />
+
+      <style>{`
+        .cecos-scroll-hidden {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+        .cecos-scroll-hidden::-webkit-scrollbar {
+          display: none;
+        }
+      `}</style>
     </div>
   );
 }
