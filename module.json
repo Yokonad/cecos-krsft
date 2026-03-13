@@ -9,5 +9,12 @@
   "gradient": "#F59E0B",
   "author": "yokonad",
   "enabled": true,
-  "dependencies": []
+  "dependencies": [],
+  "permissions": [
+    { "action": "access", "display_name": "Centros de Costo: Acceder", "description": "Permite ver el módulo de Centros de Costo en el dashboard y acceder a su página principal" },
+    { "action": "view", "display_name": "Centros de Costo: Ver", "description": "Permite visualizar el árbol de centros de costo, subcuentas, montos asignados y estructura jerárquica" },
+    { "action": "create", "display_name": "Centros de Costo: Crear", "description": "Habilita el botón «Agregar» para crear nuevos centros de costo y subcuentas dentro del árbol" },
+    { "action": "update", "display_name": "Centros de Costo: Editar", "description": "Habilita el botón «Editar» en cada centro de costo para modificar nombre, código y montos" },
+    { "action": "delete", "display_name": "Centros de Costo: Eliminar", "description": "Muestra el botón de eliminar para borrar centros de costo y sus subcuentas asociadas" }
+  ]
 }

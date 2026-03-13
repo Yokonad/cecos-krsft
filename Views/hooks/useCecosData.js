@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import { hasPermission } from '@/utils/permissions';
 import { POLLING_INTERVAL } from '../utils/constants';
 
 const getCsrfToken = () => {
@@ -130,13 +131,22 @@ export function useCecosData(auth) {
     return () => clearInterval(interval);
   }, [loadCecos]);
 
+  // ── Permisos del módulo ───
+  const permissions = useMemo(() => ({
+    view:   hasPermission(auth, 'module.cecoskrsft.view'),
+    create: hasPermission(auth, 'module.cecoskrsft.create'),
+    update: hasPermission(auth, 'module.cecoskrsft.update'),
+    delete: hasPermission(auth, 'module.cecoskrsft.delete'),
+  }), [auth]);
+
   return {
     cecos,
     loading,
     error,
-      createCeco,
+    createCeco,
     createCecoWithSubcuentas,
     updateCeco,
     deleteCeco,
+    permissions,
   };
 }

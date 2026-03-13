@@ -1,7 +1,7 @@
 import { ArrowLeftIcon, BuildingLibraryIcon, PlusIcon } from '@heroicons/react/24/outline';
 import Button from './ui/Button';
 
-export default function CecosHeader({ onBack, onCreate }) {
+export default function CecosHeader({ onBack, onCreate, canCreate }) {
   return (
     <header className="flex flex-wrap items-center justify-between gap-4 border-b border-gray-100 pb-6">
       <div className="flex items-center gap-4">
@@ -21,10 +21,12 @@ export default function CecosHeader({ onBack, onCreate }) {
         </h1>
       </div>
 
-      <Button variant="primary" size="md" onClick={onCreate} className="gap-2">
-        <PlusIcon className="size-4" />
-        Agregar
-      </Button>
+      {canCreate && (
+        <Button variant="primary" size="md" onClick={onCreate} className="gap-2">
+          <PlusIcon className="size-4" />
+          Agregar
+        </Button>
+      )}
     </header>
   );
 }

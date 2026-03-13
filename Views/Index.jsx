@@ -7,7 +7,7 @@ import CecosTabBar from './Components/CecosTabBar';
 import CecoModal from './Components/CecoModal';
 
 export default function Index({ auth }) {
-  const { cecos, loading, error, createCeco, createCecoWithSubcuentas, updateCeco, deleteCeco } = useCecosData(auth);
+  const { cecos, loading, error, createCeco, createCecoWithSubcuentas, updateCeco, deleteCeco, permissions } = useCecosData(auth);
 
   const [toast, setToast] = useState(null);
   const [showModal, setShowModal] = useState(false);
@@ -113,7 +113,7 @@ export default function Index({ auth }) {
       {/* Content */}
       <div className="w-full px-12 py-4">
         <div className="space-y-6">
-          <CecosHeader onBack={handleBack} onCreate={handleOpenCreate} />
+          <CecosHeader onBack={handleBack} onCreate={handleOpenCreate} canCreate={permissions.create} />
 
           <CecosStats
             total={stats.total}
@@ -141,6 +141,7 @@ export default function Index({ auth }) {
             loading={loading}
             onEdit={handleOpenEdit}
             onDelete={handleDelete}
+            permissions={permissions}
           />
         </div>
       </div>

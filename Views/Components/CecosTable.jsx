@@ -33,7 +33,7 @@ const BASE_ROOT_GROUPS = [
   { codigo: '109', nombre: 'CEYA' },
 ];
 
-export default function CecosTable({ cecos, loading, onEdit, onDelete }) {
+export default function CecosTable({ cecos, loading, onEdit, onDelete, permissions = {} }) {
   const [expanded, setExpanded] = useState(() => new Set());
 
   // Confirm modal state
@@ -141,7 +141,7 @@ export default function CecosTable({ cecos, loading, onEdit, onDelete }) {
                   <p className="text-xs text-gray-500">{group.clienteCount} {group.clienteCount === 1 ? 'cliente' : 'clientes'}</p>
                 </div>
                 <div className="hidden sm:flex items-center gap-2">
-                  {group.isCustomParent && (
+                  {group.isCustomParent && permissions.delete && (
                     <button
                       type="button"
                       onClick={(e) => {
@@ -228,20 +228,24 @@ export default function CecosTable({ cecos, loading, onEdit, onDelete }) {
                               <td className="px-4 py-2 text-sm whitespace-nowrap">
                                 {ceco.nivel === 1 && !ceco.tipo_subcuenta ? (
                                   <div className="inline-flex gap-2">
-                                    <button
-                                      type="button"
-                                      onClick={() => onEdit?.(ceco)}
-                                      className="rounded border border-gray-200 px-2 py-1 text-xs font-medium text-gray-700 hover:bg-gray-50"
-                                    >
-                                      Editar
-                                    </button>
-                                    <button
-                                      type="button"
-                                      onClick={() => openConfirm(ceco.id, '¿Eliminar cabeza y subcuentas?', `Se eliminará "${ceco.codigo} – ${ceco.nombre}" y todas sus subcuentas. Esta acción no se puede deshacer.`)}
-                                      className="rounded border border-red-200 px-2 py-1 text-xs font-medium text-red-700 hover:bg-red-50"
-                                    >
-                                      Eliminar
-                                    </button>
+                                    {permissions.update && (
+                                      <button
+                                        type="button"
+                                        onClick={() => onEdit?.(ceco)}
+                                        className="rounded border border-gray-200 px-2 py-1 text-xs font-medium text-gray-700 hover:bg-gray-50"
+                                      >
+                                        Editar
+                                      </button>
+                                    )}
+                                    {permissions.delete && (
+                                      <button
+                                        type="button"
+                                        onClick={() => openConfirm(ceco.id, '¿Eliminar cabeza y subcuentas?', `Se eliminará "${ceco.codigo} – ${ceco.nombre}" y todas sus subcuentas. Esta acción no se puede deshacer.`)}
+                                        className="rounded border border-red-200 px-2 py-1 text-xs font-medium text-red-700 hover:bg-red-50"
+                                      >
+                                        Eliminar
+                                      </button>
+                                    )}
                                   </div>
                                 ) : (
                                   <span className="text-xs text-gray-400">—</span>
